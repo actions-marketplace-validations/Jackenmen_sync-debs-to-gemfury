@@ -90,7 +90,13 @@ def main() -> NoReturn:
             for item in ("changelog.gz", "changelog.Debian.gz"):
                 changelog_gz_path = f"usr/share/doc/{package_name}/{item}"
                 if os.path.isfile(changelog_gz_path):
-                    _update_changelog_file(changelog_gz_path, new_version)
+                    try:
+                        _update_changelog_file(changelog_gz_path, new_version)
+                    except subprocess.CalledProcessError as exc:
+                        print(
+                            f"WARNING: Failed to update changelog file: {exc}\n"
+                            "Leaving the changelog file unchanged."
+                        )
                     break
             with open("DEBIAN/control", "w", encoding="utf-8") as fp:
                 fp.write(control_text)
